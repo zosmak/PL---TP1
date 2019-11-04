@@ -81,11 +81,11 @@ Word *GetAndSetWordFirstPosition(Word *words)
 }
 
 // sets the dictionary at the first word.
-Usage *GetDictionaryFirstPosition(Usage *dictionary)
+Usage *GetAndSetDictionaryFirstPosition(Usage *dictionary)
 {
 	if (dictionary->previous != NULL)
 	{
-		return GetDictionaryFirstPosition(dictionary->previous);
+		return GetAndSetDictionaryFirstPosition(dictionary->previous);
 	}
 	else
 	{
@@ -210,7 +210,7 @@ Usage *InsertOrderedUsage(char *name, char *wordName, char *defName, Usage *dict
 	}
 	else
 	{
-		dictionary = GetDictionaryFirstPosition(dictionary);
+		dictionary = GetAndSetDictionaryFirstPosition(dictionary);
 		Usage *cell = GetAndSetDictionaryAlphabethicalPosition(name, dictionary);
 		if (cell != NULL)
 		{
@@ -264,12 +264,11 @@ void ListWordDefinition(Def *def)
 // list all the dictionary words
 void ListUsageWords(Word *word)
 {
-	Word *WordDictionary = GetDictionaryFirstPosition(word);
+	Word *WordDictionary = GetAndSetWordFirstPosition(word);
 
 	while (WordDictionary != NULL)
 	{
 		printf("- %s:", WordDictionary->name);
-		
 		ListWordDefinition(WordDictionary->def);
 		WordDictionary = WordDictionary->next;
 	}
@@ -278,7 +277,7 @@ void ListUsageWords(Word *word)
 // list all the dictionary words
 void ListDictionary(Usage *usage)
 {
-	Usage *Dictionary = GetDictionaryFirstPosition(usage);
+	Usage *Dictionary = GetAndSetDictionaryFirstPosition(usage);
 
 	while (Dictionary != NULL)
 	{
