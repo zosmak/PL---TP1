@@ -45,22 +45,25 @@ Word* GetTheAlphabethicalPosition(char* name, Word* dictionary) {
 	char *newname = dictionary->name;
     // validate the alphabethical 10 chars from the 2 words
 	if(strncmp(name, dictionary->name, 15) < 0){
-    	// the word procceeds the dictionary word
         if(dictionary->previous == NULL){
         	return NULL;	
 		} 
 		
+		// has previous and the word is higher than the word that's in the dictionary
 		char *lastName = dictionary->previous->name;
         return dictionary->previous;
 	} else {
+		//it's the last word
 		if(dictionary->next == NULL){
     		return dictionary;
 		}
 	}
  
+ 	// repeat everything with the next word
 	return GetTheAlphabethicalPosition(name, dictionary->next);
 }
 
+// sets the dictionary at the first word.
 Word* GetDictionaryFirstPosition(Word* dictionary){
 	if (dictionary->previous != NULL) {
 		return GetDictionaryFirstPosition(dictionary->previous);
@@ -70,6 +73,7 @@ Word* GetDictionaryFirstPosition(Word* dictionary){
  
 }
 
+// insert a word alphabetically
 Word* InsertOrderedWord(char* name, char* def, Word* dictionary){
  if(dictionary == NULL){
      return InsertWord(NULL, NULL, name, def);
@@ -98,6 +102,7 @@ Word* InsertOrderedWord(char* name, char* def, Word* dictionary){
     }
 }
 
+// list the word definition
 void ListWordDefinition(Def* def) {
     if (def != NULL) {
         printf("%s; ", def->desc);
@@ -109,18 +114,18 @@ void ListWordDefinition(Def* def) {
 	}
 }
 
+// list all the dictionary words
 void ListDictionary(Word* word) {
-    if (word != NULL) {
-        printf("Definicoes de %s:\n", word->name);
-        ListWordDefinition(word->def);
-        ListDictionary(word->next);
-    } else {
-    	printf("Dicionario vazio...\n");
-	}
+	Word *Dictionary = GetDictionaryFirstPosition(Dictionary);
+	
+    while(Dictionary != NULL) {
+        printf("Definicoes de %s:\n", Dictionary->name);
+        ListWordDefinition(Dictionary->def);
+        Dictionary = Dictionary->next;
+    }
 }
 
 int main() {
-	
 	
 	// initialize our dictionary
     Word *Dictionary = NULL;
@@ -132,14 +137,14 @@ int main() {
 	Dictionary = InsertOrderedWord("cenourasc", "Cenourinhas do LIDL", Dictionary);
     Dictionary = InsertOrderedWord("cenourasaaa", "Cenourinhas do LIDL", Dictionary);
     
-    /*
+    /*s
 	EM FALTA:
 	- SE A PALAVRA EXISTE, ADICIONADA ÀS DEFINIÇÔES.
 	- ADICIONAR AS USABILIDADES TAMBÉM
 	*/
 
 	
-	Dictionary = GetDictionaryFirstPosition(Dictionary);
+	// list all the dictionary words
     ListDictionary(Dictionary);
     
 	getchar();
