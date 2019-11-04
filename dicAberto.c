@@ -18,6 +18,15 @@ typedef struct _word
 	struct _word *previous;
 } Word;
 
+// usage struct
+typedef struct _usage
+{
+	char *name;
+	struct _word *word;
+	struct _usage *next;
+	struct _usage *previous;
+} Usage;
+
 // insert a word description in our dictionary
 Def *InsertDescription(Def *lastDef, char *desc)
 {
@@ -34,7 +43,7 @@ Def *InsertDescription(Def *lastDef, char *desc)
 	return cell;
 }
 
-// insert a word in our dictionary
+// insert a word in our usage
 Word *InsertWord(Word *previous, Word *next, char *name, char *def)
 {
 	Word *cell = (Word *)malloc(sizeof(Word));
@@ -46,11 +55,91 @@ Word *InsertWord(Word *previous, Word *next, char *name, char *def)
 	return cell;
 }
 
+// insert a usage in our dictionary
+Usage *InsertUsage(Usage *previous, Usage *next, char *name, char *wordName, char *wordDef)
+{
+	Usage *cell = (Usage *)malloc(sizeof(Usage));
+	cell->name = strdup(name);
+	cell->word = InsertOrderedWord(char *wordName, char *wordDef, cell->word);
+	cell->previous = previous;
+	cell->next = next;
+
+	return cell;
+}
+
+// sets the words at first position.
+Word *GetAndSetWordFirstPosition(Word *words)
+{
+	if (words->previous != NULL)
+	{
+		return GetAndSetWordFirstPosition(words->previous);
+	}
+	else
+	{
+		return words;
+	}
+}
+
+// sets the dictionary at the first word.
+Usage *GetDictionaryFirstPosition(Usage *dictionary)
+{
+	if (dictionary->previous != NULL)
+	{
+		return GetDictionaryFirstPosition(dictionary->previous);
+	}
+	else
+	{
+		return dictionary;
+	}
+}
+
+
 // get the alphabethical position to insert the new word
-Word *GetTheAlphabethicalPosition(char *name, Word *dictionary)
+Word *GetAndSetWordAlphabethicalPosition(char *name, Word *words)
+{
+	char *newname = words->name;
+	// validate the alphabethical 10 chars from the 2 words
+	if (strncmp(name, words->name, 15) == 0)
+	{
+		//it's the same word
+		return words;
+	}
+
+	if (strncmp(name, words->name, 15) < 0)
+	{
+		if (words->previous == NULL)
+		{
+			return NULL;
+		}
+
+		// has previous and the word is higher than the word that's in the words
+		char *lastName = words->previous->name;
+		return words->previous;
+	}
+	else
+	{
+		//it's the last word
+		if (words->next == NULL)
+		{
+			return words;
+		}
+	}
+
+	// repeat everything with the next word
+	return GetTheAlphabethicalPosition(name, words->next);
+}
+
+// get the alphabethical position to insert the new dictionary
+Usage *GetAndSetDictionaryAlphabethicalPosition(char *name, Usage *dictionary)
 {
 	char *newname = dictionary->name;
-	// validate the alphabethical 10 chars from the 2 words
+	// validate the alphabethical 10 chars from the 2 dictionary
+	if (strncmp(name, dictionary->name, 15) == 0)
+	{
+		//it's the same word
+		return dictionary;
+	}
+
 	if (strncmp(name, dictionary->name, 15) < 0)
 	{
 		if (dictionary->previous == NULL)
@@ -72,33 +161,19 @@ Word *GetTheAlphabethicalPosition(char *name, Word *dictionary)
 	}
 
 	// repeat everything with the next word
-	return GetTheAlphabethicalPosition(name, dictionary->next);
+	return GetAndSetDictionaryAlphabethicalPosition(name, dictionary->next);
 }
 
-// sets the dictionary at the first word.
-Word *GetDictionaryFirstPosition(Word *dictionary)
+Word *InsertOrderedWord(char *name, char *def, Word *words)
 {
-	if (dictionary->previous != NULL)
-	{
-		return GetDictionaryFirstPosition(dictionary->previous);
-	}
-	else
-	{
-		return dictionary;
-	}
-}
-
-// insert a word alphabetically
-Word *InsertOrderedWord(char *name, char *def, Word *dictionary)
-{
-	if (dictionary == NULL)
+	if (words == NULL)
 	{
 		return InsertWord(NULL, NULL, name, def);
 	}
 	else
 	{
-		dictionary = GetDictionaryFirstPosition(dictionary);
-		Word *cell = GetTheAlphabethicalPosition(name, dictionary);
+		words = GetAndSetWordFirstPosition(words);
+		Word *cell = GetAndSetWordAlphabethicalPosition(name, words);
 		if (cell != NULL)
 		{
 			Word *nextWord = NULL;
@@ -107,7 +182,50 @@ Word *InsertOrderedWord(char *name, char *def, Word *dictionary)
 				nextWord = cell->next;
 			}
 			char *asd = cell->name;
-			dictionary = InsertWord(cell, nextWord, name, def);
+			words = InsertWord(cell, nextWord, name, def);
+			words->previous->next = words;
+			if (nextWord != NULL)
+			{
+				words->next->previous = words;
+			}
+			return words;
+		}
+		else
+		{
+			// no previous cell, place it at first place
+			words = InsertWord(NULL, words, name, def);
+			words->next->previous = words;
+			return words;
+		}
+	}
+}
+
+// insert a word alphabetically
+Usage *InsertOrderedUsage(char *name, char *wordName, char *defName, Usage *dictionary)
+{
+	// our dictionary is empty
+	if (Usage == NULL)
+	{
+		return InsertUsage(NULL, NULL, name, wordName, defName);
+	}
+	else
+	{
+		dictionary = GetDictionaryFirstPosition(dictionary);
+		Usage *cell = GetAndSetDictionaryAlphabethicalPosition(name, dictionary);
+		if (cell != NULL)
+		{
+			//if it's the same word
+			if (cell->name == name)
+			{
+				cell->word = InsertOrderedWord(wordName, defName, cell->word);
+			}
+			// 
+			Usage *nextUsage = NULL;
+			if (cell->next != NULL)
+			{
+				nextUsage = cell->next;
+			}
+			dictionary = InsertUsage(cell, nextUsage, name, wordName, defName);
 			dictionary->previous->next = dictionary;
 			if (nextWord != NULL)
 			{
@@ -118,7 +236,7 @@ Word *InsertOrderedWord(char *name, char *def, Word *dictionary)
 		else
 		{
 			// no previous cell, place it at first place
-			dictionary = InsertWord(NULL, dictionary, name, def);
+			dictionary = InsertUsage(NULL, dictionary, name, wordName, defName);
 			dictionary->next->previous = dictionary;
 			return dictionary;
 		}
@@ -130,7 +248,7 @@ void ListWordDefinition(Def *def)
 {
 	if (def != NULL)
 	{
-		printf("%s; ", def->desc);
+		printf("%s, ", def->desc);
 		if (def->next != NULL)
 		{
 			ListWordDefinition(def->next);
@@ -142,15 +260,30 @@ void ListWordDefinition(Def *def)
 	}
 }
 
+
 // list all the dictionary words
-void ListDictionary(Word *word)
+void ListUsageWords(Word *word)
 {
-	Word *Dictionary = GetDictionaryFirstPosition(Dictionary);
+	Word *WordDictionary = GetDictionaryFirstPosition(word);
+
+	while (WordDictionary != NULL)
+	{
+		printf("- %s:", WordDictionary->name);
+		
+		ListWordDefinition(WordDictionary->def);
+		WordDictionary = WordDictionary->next;
+	}
+}
+
+// list all the dictionary words
+void ListDictionary(Usage *usage)
+{
+	Usage *Dictionary = GetDictionaryFirstPosition(usage);
 
 	while (Dictionary != NULL)
 	{
-		printf("Definicoes de %s:\n", Dictionary->name);
-		ListWordDefinition(Dictionary->def);
+		printf("%s:\n", Dictionary->name);
+		ListUsageWords(Dictionary->word);
 		Dictionary = Dictionary->next;
 	}
 }
@@ -158,20 +291,17 @@ void ListDictionary(Word *word)
 int main()
 {
 	// initialize our dictionary
-	Word *Dictionary = NULL;
-	Dictionary = InsertOrderedWord("batatas", "Batatinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedWord("cenourasa", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedWord("gageasdsad", "gage do gage", Dictionary);
-	Dictionary = InsertOrderedWord("cenourasb", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedWord("abacate", "Abacatinho do LIDL", Dictionary);
-	Dictionary = InsertOrderedWord("cenourasc", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedWord("cenourasaaa", "Cenourinhas do LIDL", Dictionary);
+	Usage *Dictionary = NULL;
 
-	/*s
-	EM FALTA:
-	- SE A PALAVRA EXISTE, ADICIONA APENAS �S DEFINI��ES.
-	- ADICIONAR AS USABILIDADES TAMB�M
-	*/
+	//Insert word, (usage, orth, definition, currentDictionary)
+	Dictionary = InsertOrderedWord("batatas", "batatas2", "Batatinhas do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("cenourasa", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("gageasdsad", "batatas2", "gage do gage", Dictionary);
+	Dictionary = InsertOrderedWord("cenourasb", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("abacate", "batatas2", "Abacatinho do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("cenourasc", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("cenourasaaa", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertOrderedWord("cenourasaaa", "batatas2", "Cenourinhas do LIDL 2", Dictionary);
 
 	// list all the dictionary words
 	ListDictionary(Dictionary);
