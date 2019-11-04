@@ -131,6 +131,12 @@ int main() {
     Dictionary = InsertOrderedWord("abacate", "Abacatinho do LIDL", Dictionary);
 	Dictionary = InsertOrderedWord("cenourasc", "Cenourinhas do LIDL", Dictionary);
     Dictionary = InsertOrderedWord("cenourasaaa", "Cenourinhas do LIDL", Dictionary);
+    
+    /*
+	EM FALTA:
+	- SE A PALAVRA EXISTE, ADICIONADA ÀS DEFINIÇÔES.
+	- ADICIONAR AS USABILIDADES TAMBÉM
+	*/
 
 	
 	Dictionary = GetDictionaryFirstPosition(Dictionary);
