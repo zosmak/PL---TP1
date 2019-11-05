@@ -294,7 +294,7 @@ void ListDictionary(Usage *usage)
 	}
 }
 
-int main()
+/*int main()
 {
 	// initialize our dictionary
 	Usage *Dictionary = NULL;
@@ -315,4 +315,4 @@ int main()
 
 	getchar();
 	return 0;
-}
+}*/
