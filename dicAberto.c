@@ -55,7 +55,6 @@ Word *InsertWord(Word *previous, Word *next, char *name, char *def)
 	return cell;
 }
 
-
 // sets the words at first position.
 Word *GetAndSetWordFirstPosition(Word *words)
 {
@@ -68,7 +67,6 @@ Word *GetAndSetWordFirstPosition(Word *words)
 		return words;
 	}
 }
-
 
 // get the alphabethical position to insert the new word
 Word *GetAndSetWordAlphabethicalPosition(char *name, Word *words)
@@ -105,7 +103,6 @@ Word *GetAndSetWordAlphabethicalPosition(char *name, Word *words)
 	return GetAndSetWordAlphabethicalPosition(name, words->next);
 }
 
-
 Word *InsertOrderedWord(char *name, char *def, Word *words)
 {
 	if (words == NULL)
@@ -114,7 +111,7 @@ Word *InsertOrderedWord(char *name, char *def, Word *words)
 	}
 	else
 	{
-		
+
 		words = GetAndSetWordFirstPosition(words);
 		Word *cell = GetAndSetWordAlphabethicalPosition(name, words);
 		if (cell != NULL)
@@ -125,7 +122,7 @@ Word *InsertOrderedWord(char *name, char *def, Word *words)
 				cell->def = InsertDescription(cell->def, def);
 				return words;
 			}
-			
+
 			Word *nextWord = NULL;
 			if (cell->next != NULL)
 			{
@@ -162,7 +159,6 @@ Usage *InsertUsage(Usage *previous, Usage *next, char *name, char *wordName, cha
 	return cell;
 }
 
-
 // sets the dictionary at the first word.
 Usage *GetAndSetDictionaryFirstPosition(Usage *dictionary)
 {
@@ -175,7 +171,6 @@ Usage *GetAndSetDictionaryFirstPosition(Usage *dictionary)
 		return dictionary;
 	}
 }
-
 
 // get the alphabethical position to insert the new dictionary
 Usage *GetAndSetDictionaryAlphabethicalPosition(char *name, Usage *dictionary)
@@ -213,7 +208,7 @@ Usage *GetAndSetDictionaryAlphabethicalPosition(char *name, Usage *dictionary)
 }
 
 // insert a word alphabetically
-Usage *InsertOrderedUsage(char *name, char *wordName, char *defName, Usage *dictionary)
+Usage *InsertInDictionary(char *name, char *wordName, char *defName, Usage *dictionary)
 {
 	// our dictionary is empty
 	if (dictionary == NULL)
@@ -232,7 +227,7 @@ Usage *InsertOrderedUsage(char *name, char *wordName, char *defName, Usage *dict
 				cell->word = InsertOrderedWord(wordName, defName, cell->word);
 				return dictionary;
 			}
-			// 
+			//
 			Usage *nextUsage = NULL;
 			if (cell->next != NULL)
 			{
@@ -273,7 +268,6 @@ void ListWordDefinition(Def *def)
 	}
 }
 
-
 // list all the dictionary words
 void ListUsageWords(Word *word)
 {
@@ -306,14 +300,15 @@ int main()
 	Usage *Dictionary = NULL;
 
 	//Insert word, (usage, orth, definition, currentDictionary)
-	Dictionary = InsertOrderedUsage("batatas", "batatas2", "Batatinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("cenourasa", "batatas2", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("gageasdsad", "batatas2", "gage do gage", Dictionary);
-	Dictionary = InsertOrderedUsage("cenourasb", "batatas2", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("abacate", "batatas2", "Abacatinho do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("cenourasc", "batatas2", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("cenourasaaa", "batatas2", "Cenourinhas do LIDL", Dictionary);
-	Dictionary = InsertOrderedUsage("cenourasaaa", "batatas3", "Cenourinhas do LIDL 2", Dictionary);
+	Dictionary = InsertInDictionary("batatas", "batatas", "Batatinhas do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("cenourasa", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("gageasdsad", "batatas", "gage do gage", Dictionary);
+	Dictionary = InsertInDictionary("cenourasb", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("abacate", "batatas2", "Abacatinho do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("cenourasc", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("cenourasaaa", "batatas2", "Cenourinhas do LIDL", Dictionary);
+	Dictionary = InsertInDictionary("cenourasaaa", "batatas2", "Cenourinhas do LIDL 2", Dictionary);
+	Dictionary = InsertInDictionary("cenourasaaa", "batatas3", "Cenourinhas do LIDL", Dictionary);
 
 	// list all the dictionary words
 	ListDictionary(Dictionary);
